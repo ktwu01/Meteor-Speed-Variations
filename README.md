@@ -16,7 +16,8 @@ W. Yi and X. Xue, yiwen@ustc.edu.cn; xuexh@ustc.edu.cn
 
 ## Data
 Data Availability Statement
-The Mengcheng meteor radar data presented in this work is available at [Wu et al. (2023)](https://zenodo.org/records/8002780).
+The Mengcheng meteor radar data presented in this work is available at Wu et al. (2023): 
+Wu, K., Yi, W., Xue, X., Reid, I., & Lu, M. (2023). Data of Mengcheng meteor velocity (version 0) [Dataset]. Zenodo. https://doi.org/10.5281/zenodo.8002780.
 
 ## Keywords and subjects
 meteor velocity, meteor radar, meteor shower
