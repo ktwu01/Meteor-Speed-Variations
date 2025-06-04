@@ -1,0 +1,313 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Welcome to Overleaf --- just edit your LaTeX on the left,
+% and we'll compile it for you on the right. If you open the
+% 'Share' menu, you can invite other users to edit at the same
+% time. See www.overleaf.com/learn for more info. Enjoy!
+%
+% Note: you can export the pdf to see the result at full
+% resolution.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The Earth's orbit around the Sun
+% Author: Julien Cretel, 25/02/2013
+\documentclass{standalone}
+\usepackage{tikz,tikz-3dplot}
+\usetikzlibrary{patterns,backgrounds,math}
+% \setbeamertemplate{navigation symbols}{}
+
+\RequirePackage[T1]{fontenc} %  Font encoding https://texfaq.org/FAQ-why-inp-font
+\RequirePackage[default,semibold]{sourcesanspro}
+
+\begin{document}
+% \begin{frame}[fragile]
+% \frametitle{}
+% \begin{center}
+\tdplotsetmaincoords{0}{0} % this sets the view angle
+% \begin{tikzpicture}[scale=5.5]
+\begin{tikzpicture}[tdplot_main_coords, scale=5]
+%  \setbeamercovered{invisible}
+\pgfmathsetmacro{\Sunradius}{0.3}   % Sun radius
+\pgfmathsetmacro{\Earthradius}{0.2} % Earth radius
+\pgfmathsetmacro{\bigEarthdistance}{2} % big Earth's center distance from the sun center
+
+\pgfmathsetmacro{\bigEarthradius}{0.37} % big Earth radius
+\pgfmathsetmacro{\e}{0.01}          % Excentricity of the elliptical orbit
+\pgfmathsetmacro{\b}{sqrt(1-\e*\e)} % Minor radius (major radius = 1)
+
+% % 设置坐标原点
+% \coordinate (O) at (0,0,0);
+
+% %A
+% % \draw [颜色，绕z旋转角度，绕x旋转角度] 起点坐标 画弧 (0到360度半径为6) node for循环{参数}[位置，内部间距，圆，阴影种类，球颜色，不透明度，标签={emoji放中间}]{文本是空};
+% % 用circle可以画圆，但无法使用pos定义节点位置
+% \draw [color = red!70!yellow,rotate around z=0,rotate around x=55] (0.3,0,0) arc(0:360:2*\Earthradius)
+  
+    % Draw the elliptical path of the Earth.
+    \draw[fill=white!70!yellow] (0,0) ellipse (1 and {\b});
+    
+    % draw the speed arrows alone the path, one below and one on the top
+    \draw[color = red!70!yellow, -latex, ultra thick] (-0.1*\b,-0.6*\b)--(0.1*\b,-0.6*\b) node[above] {\bf 29.8 km/s};
+    \draw[color = red!70!yellow, -latex, ultra thick] (0.1*\b,0.6*\b)--(-0.1*\b,0.6*\b) node[below] {\bf 29.8 km/s};
+    %Earth speed at perihelion
+    \draw [color = red!70!yellow, -latex, ultra thick] (1.1*\b,0.3*\b)  --(1.1*\b,0.5*\b)  node [above] {\bf 30.3 km/s};
+
+    %Earth speed at aphelion
+    \draw [color = red!70!yellow, -latex, ultra thick] (-1.1*\b,-0.3*\b) -- (-1.1*\b,-0.5*\b) node [below] {\bf 29.3 km/s};
+
+    % % Draw the elliptical path of the Meteoroid Stream.
+    % \draw[thin] (0,1) ellipse (2 and {\b});
+
+    % Draw the Sun at the right-hand-side focus
+    \shade[
+    top color=yellow!70,
+    bottom color=red!70,
+    shading angle={45},
+   ] ({sqrt(1-\b*\b)},0) circle (\Sunradius);
+    % \visible<1>{
+    % \draw ({sqrt(1-\b*\b)},-\Sunradius) node[below] { Sun};
+    \draw ({sqrt(1-\b*\b)},0) node[] {Sun};
+  % }
+  	
+  % This function computes the direction in which light hits the Earth.
+  \pgfmathdeclarefunction{f}{1}{%
+    \pgfmathparse{
+      ((-\e+cos(#1))<0) * ( 180 + atan( \b*sin(#1)/(-\e+cos(#1)) ) ) 
+        +
+      ((-\e+cos(#1))>=0) * ( atan( \b*sin(#1)/(-\e+cos(#1)) ) ) 
+    }
+  }
+
+  % This function computes the distance between Earth and the Sun,
+  % which is used to calculate the varying radiation intensity on Earth.
+  \pgfmathdeclarefunction{d}{1}{%
+    \pgfmathparse{ sqrt((-\e+cos(#1))*(-\e+cos(#1))+\b*sin(#1)*\b*sin(#1)) }
+  }
+						
+  % Produces a series of frames showing one revolution
+  % (the total number of frames is controlled by macro \N)
+  \pgfmathtruncatemacro{\N}{12}
+  \foreach \k/\Date in {0/{Perihelion (Jan 4)}, 3/Spring (Apr 4), 6/Aphelion (Jul 4), 9/Autumn (Oct 2)}{
+  % \foreach \k/\Date in {0/Perihelion, 2/Spring, 6/Aphelion, 8/Autumn }{
+  % \foreach \k/\Date in {0/Perihelion, 2/Spring equinox,6/Aphelion,8/Autumn equinox}{
+    \pgfmathsetmacro{\theta}{360*\k/\N}
+      \pgfmathsetmacro{\radiation}{100*(1-\e)/(d(\theta)*d(\theta))}
+
+      \colorlet{Earthlight}{yellow!\radiation!blue}
+      
+      \pgfmathparse{int(\k+1)}
+
+
+      \onslide<\pgfmathresult>{
+        % \onslide is used instead of \visible<.-(x)> and \pause,
+        % in order not to break the header and footer.
+
+
+%%%%%%%%%%% !! change the point to the core of the earth by:
+% \draw [-] ({cos(\theta)},{\b*sin(\theta)}) +
+
+        % new: Ax y (23.43° degree):
+        \draw [-latex,thick] ({cos(\theta)},{\b*sin(\theta)}) +(-113.43:1.2*\Earthradius)--+(66.57:1.5*\Earthradius) node [] {};
+        \draw[-stealth] ({cos(\theta)},{\b*sin(\theta)})+        (70:1.2*\Earthradius) arc (117:390:0.1*\Earthradius);
+        
+        \shade[
+          top color=Earthlight,
+          bottom color=blue,
+          shading angle={90+f(\theta)},
+        ] ({cos(\theta)},{\b*sin(\theta)}) circle (\Earthradius);
+
+        % % equator (180-23.43°=156.57 degree)
+        \draw [white] ({cos(\theta)},{\b*sin(\theta)}) + (156.57:1*\Earthradius) -- +(-23.43:1*\Earthradius); % node [above ] {equator};
+        \draw ({cos(\theta)},{\b*sin(\theta)}) +(-16:0.78*\Earthradius) node[] {};
+        
+        % Mengcheng transimitter (123.14:1.1) 33.4°N, 116.4°E  180-23.43-33.4 = 123.14
+        \draw[white, dashed, thick]  ({cos(\theta)},{\b*sin(\theta)}) + -- +(123.14:1*\Earthradius) node[] {};
+        \draw[color = red!70!yellow, thick]   ({cos(\theta)},{\b*sin(\theta)}) +(123.14:1*\Earthradius)--+(123.14:1.1*\Earthradius) node[below left] {\bf };
+        % \draw (143:0.6) node[] {$ 33.4^\circ$};
+        % \draw[-stealth] (156.57:0.4) arc (156.57:123.14:0.4);
+        % \draw[dashed]   (123.14:1)--(10:1) node[below left] {\bf };
+        
+        %% mushroom: radius ~ 0.13*\Earthradius
+        \draw[color = red!70!yellow, thick] ({cos(\theta)},{\b*sin(\theta)}) +(116.14:1.1*\Earthradius)--+(130.14:1.1*\Earthradius) node[above left] {\bf };
+        \draw[color = red!70!yellow, thick] ({cos(\theta)},{\b*sin(\theta)}) +(116.14:1.1*\Earthradius) arc (33.14:213.14:0.13*\Earthradius);
+        %% red, dashed, the angle depends on the parameters of MMR meteor radar
+%        \draw [color = red!70!yellow, dashed]({cos(\theta)},{\b*sin(\theta)}) ++(123.14:1.1*\Earthradius)--+(60:0.13*\Earthradius)--cycle;
+%        \draw [color = red!70!yellow, dashed]({cos(\theta)},{\b*sin(\theta)}) ++(123.14:1.1*\Earthradius)--+(180:0.13*\Earthradius)--cycle;
+ 
+        % %% blue, meteors trace
+        \draw [blue, dashed, -stealth]({cos(\theta)},{\b*sin(\theta)}) ++(123.14:1.1*\Earthradius)++(60:0.13*\Earthradius)++(150:0.15*\Earthradius)--+(-30:0.3*\Earthradius);
+        \draw [blue, dashed, -stealth]({cos(\theta)},{\b*sin(\theta)}) ++(123.14:1.1*\Earthradius)++(180:0.13*\Earthradius)++(90:0.15*\Earthradius)--+(-90:0.3*\Earthradius);
+        % % \draw [blue, thick, -stealth]({cos(\theta)},{\b*sin(\theta)}) ++(123.14:1.1*\Earthradius)++(60:0.13*\Earthradius)++(150:0.15*\Earthradius)--+(-30:0.3*\Earthradius);
+    }
+    }
+
+
+
+  \foreach \k/\Date in {3/Spring (Apr 4)}{
+    \pgfmathsetmacro{\theta}{360*\k/\N}
+          \draw ({1.1*cos(\theta)+1.1*\Earthradius},{1.1*\b*sin(\theta)}) node[right] {\Date};
+}
+
+  \foreach \k/\Date in {6/Aphelion (Jul 4)}{
+    \pgfmathsetmacro{\theta}{360*\k/\N}
+          \draw ({cos(\theta)+1*\Earthradius},{\b*sin(\theta)}) node[ right] { \Date};
+}
+
+  \foreach \k/\Date in {0/{Perihelion (Jan 4)}}{
+    \pgfmathsetmacro{\theta}{360*\k/\N}
+          \draw ({0.2*cos(\theta)+1*\Earthradius},{\b*sin(\theta)}) node[right] {\Date};
+}
+
+  \foreach \k/\Date in {8/Autumn (Oct 2)}{
+    \pgfmathsetmacro{\theta}{360*\k/\N}
+          \draw ({1.5*cos(\theta)+1.5*\Earthradius},{1.2*\b*sin(\theta)}) node[below] {\Date};
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%% draw the biggest earth
+    \pgfmathsetmacro{\azimuth}{250}
+    {
+        %%%%%%%%%%% !! change the point to the core of the biggest earth by:
+        % \draw [-] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})
+        % new: Ax y (23.43° degree):
+        \draw [-latex,thick] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(-113.43:1.2*\bigEarthradius)--+(66.57:1.4*\bigEarthradius) node [] {};
+        \draw[-stealth] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+        (70:1.2*\bigEarthradius) arc (117:390:0.1*\bigEarthradius);
+
+        \shade[
+          top color=blue,
+          bottom color=blue,
+          shading angle={f(\azimuth)},
+        ] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) circle (\bigEarthradius);
+
+        % % equator (180-23.43°=156.57 degree)
+        \draw [white] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + (156.57:1*\bigEarthradius) -- +(-23.43:1*\bigEarthradius); % node [above ] {equator};
+        \draw ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(-16:0.78*\bigEarthradius) node[] {};
+        % Mengcheng speed
+        % \draw [color = red!70!yellow] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+  +(160:1.4*\bigEarthradius)   node [above] {0.4 km/s};
+        
+        % Mengcheng transimitter (123.14:1.1) 33.4°N, 116.4°E  180-23.43-33.4 = 123.14
+        % MC's location: ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+  +(123.14:1*\bigEarthradius)
+        \draw[white, dashed, thick]  ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + -- +(123.14:1*\bigEarthradius) node[] {};
+        \draw[color = red!70!yellow, thick]   ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(123.14:1*\bigEarthradius)--+(123.14:1.1*\bigEarthradius) node[below left] {\bf };
+
+        % draw the 33.4 degree label on Earth
+        \draw [white]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(-160:0.3*\bigEarthradius) node[] {33.4°};
+        \draw[white, -stealth] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+ +(156.57:0.4*\bigEarthradius) arc (156.57:123.14:0.4*\bigEarthradius);
+
+        % \draw (143:0.6) node[] {$ 33.4^\circ$};
+        % \draw[-stealth] (156.57:0.4) arc (156.57:123.14:0.4);
+        % \draw[dashed]   (123.14:1)--(10:1) node[below left] {\bf };
+        
+        %% mushroom: radius ~ 0.13*\bigEarthradius
+        \draw[color = red!70!yellow, thick] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(116.14:1.1*\bigEarthradius)--+(130.14:1.1*\bigEarthradius) node[above left] { MC};
+        \draw[color = red!70!yellow, thick] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(116.14:1.1*\bigEarthradius) arc (33.14:213.14:0.13*\bigEarthradius);
+        %% red, dashed, the angle depends on the parameters of MMR meteor radar
+%        \draw [color = red!70!yellow, dashed]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(123.14:1.1*\bigEarthradius)--+(60:0.13*\bigEarthradius)--cycle;
+%        \draw [color = red!70!yellow, dashed]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(123.14:1.1*\bigEarthradius)--+(180:0.13*\bigEarthradius)--cycle;
+ 
+        %% blue, meteors trace
+        \draw [blue, dashed, -stealth]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(123.14:1.1*\bigEarthradius)++(60:0.13*\bigEarthradius)++(150:0.15*\bigEarthradius)--+(-30:0.3*\bigEarthradius);
+        % \draw [blue, thick, -stealth]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(123.14:1.1*\bigEarthradius)++(60:0.13*\bigEarthradius)++(150:0.15*\bigEarthradius)--+(-30:0.3*\bigEarthradius);
+        \draw [blue, dashed, -stealth]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(123.14:1.1*\bigEarthradius)++(180:0.13*\bigEarthradius)++(90:0.15*\bigEarthradius)--+(-90:0.3*\bigEarthradius);
+        }
+
+
+
+%%%%%%%%%%%%%%%%%%%% draw another biggest earth
+    \pgfmathsetmacro{\azimuth}{-70}
+    {
+        %%%%%%%%%%% !! change the point to the core of the biggest earth by:
+        % \draw [-] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})
+        % new: Ax y (23.43° degree):
+        % \draw [-latex,thick] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(-113.43:1.2*\bigEarthradius)--+(66.57:\bigEarthdistance*\bigEarthradius) node [] {};
+        % \draw[-stealth] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+        (70:1.2*\bigEarthradius) arc (117:390:0.1*\bigEarthradius);
+        
+        \shade[
+          top color=yellow!90!blue,
+          bottom color=blue,
+          shading angle={90},
+        ] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) circle (\bigEarthradius);
+
+        % % % equator (180-23.43°=156.57 degree)
+        % \draw [white] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + (156.57:1*\bigEarthradius) -- +(-23.43:1*\bigEarthradius); % node [above ] {equator};
+        % \draw ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(-16:0.78*\bigEarthradius) node[] {};
+        % Mengcheng speed
+        % \draw [color = red!70!yellow] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+  +(160:1.4*\bigEarthradius)   node [above] {0.4 km/s};
+        
+        % Mengcheng transimitter (123.14:1.1) 33.4°N, 116.4°E  180-23.43-33.4 = 123.14
+        % MC's location: ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+  +(123.14:1*\bigEarthradius)
+        
+        
+        
+        
+        % dashed line
+        % \draw[white, dashed, thick]  ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + -- +(123.14:1*\bigEarthradius) node[] {};
+        
+
+        % \draw[color = red!70!yellow, thick]   ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(123.14:1*\bigEarthradius)--+(123.14:1.1*\bigEarthradius) node[below left] {\bf };
+
+        % draw the 33.4 degree label on Earth
+        % \draw [white]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(-160:0.3*\bigEarthradius) node[] {33.4°};
+
+
+
+
+        % draw the Earth rotation direction
+        \draw[white, -stealth, thick] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+ +(120:0.25*\bigEarthradius) arc (120:390:0.25*\bigEarthradius);
+
+        % Drawing the circle with radius 0.1*\bigEarthradius
+        \draw[white] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) circle (0.1*\bigEarthradius);
+        
+        % Drawing the point at the center of the circle
+        \fill[white] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) circle (0.3pt);
+
+
+        \foreach \a/\n in {6~LT/6,12~LT~~~~/12,18~LT/18,~~~~24~LT/24} {
+        \draw ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + + ({90*(\n/6)}:{1.1*\bigEarthradius})  ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)})+({90*(\n/6)}:{1.2*\bigEarthradius}) node[center] {\a};
+        }
+
+        % \draw (143:0.6) node[] {$ 33.4^\circ$};
+        % \draw[-stealth] (156.57:0.4) arc (156.57:123.14:0.4);
+        % \draw[dashed]   (123.14:1)--(10:1) node[below left] {\bf };
+        
+        %% mushroom: radius ~ 0.13*\bigEarthradius
+        % \draw[color = red!70!yellow, thick] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(116.14:1.1*\bigEarthradius)--+(130.14:1.1*\bigEarthradius) node[above left] { MC};
+        % \draw[color = red!70!yellow, thick] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) +(116.14:1.1*\bigEarthradius) arc (33.14:213.14:0.13*\bigEarthradius);
+        %% red, dashed, the angle depends on the parameters of MMR meteor radar
+%        \draw [color = red!70!yellow, dashed]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(123.14:1.1*\bigEarthradius)--+(60:0.13*\bigEarthradius)--cycle;
+%        \draw [color = red!70!yellow, dashed]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(123.14:1.1*\bigEarthradius)--+(180:0.13*\bigEarthradius)--cycle;
+
+
+
+        %meteor swept up by Earth speed at perihelion
+        \draw [color = red!70!yellow] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + + (0,0.1*\bigEarthradius) ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + + (0,0.5*\bigEarthradius)  node [above] {v+30 km/s};
+
+        %meteor decrease by Earth speed at perihelion
+        \draw [color = red!70!yellow] ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + + (0,-0.1*\bigEarthradius) ({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) + + (0,-0.5*\bigEarthradius)  node [below] {v-30 km/s};
+
+        %% blue, meteors trace
+        \draw [blue, dashed, -stealth]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(105:1.1*\bigEarthradius)++(180:0.13*\bigEarthradius)++(90:0.15*\bigEarthradius)--+(-90:0.3*\bigEarthradius);
+
+        \draw [blue, dashed, -stealth]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(-105:1.1*\bigEarthradius)++(180:0.13*\bigEarthradius)++(-90:0.15*\bigEarthradius)--+(90:0.3*\bigEarthradius);
+
+        \draw [blue, dashed, -stealth]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(65:1.19*\bigEarthradius)++(180:0.13*\bigEarthradius)++(90:0.15*\bigEarthradius)--+(-90:0.3*\bigEarthradius);
+
+        \draw [blue, dashed, -stealth]({\bigEarthdistance*cos(\azimuth)},{\b*\bigEarthdistance*sin(\azimuth)}) ++(-65:1.19*\bigEarthradius)++(180:0.13*\bigEarthradius)++(-90:0.15*\bigEarthradius)--+(90:0.3*\bigEarthradius);
+
+        }
+
+
+
+        % \draw [color = black] ({0.6*cos(\azimuth)},{\b*1.8*sin(\azimuth)})  node [above] {(c)};
+
+        \draw [color = black] ({0.4},{-\b*1.4})  node [above, scale=1.5] {(c)};
+
+        \draw [color = black] ({-1},{\b})  node [above, scale=1.5] {(a)};
+
+        \draw [color = black] ({-1},{-\b*1.4})  node [above, scale=1.5] {(b)};
+
+
+% North ecliptic pole
+\draw [-latex, thick] (0,1.3) -- (0,1.5) node [above] {North ecliptic pole};
+
+  \end{tikzpicture}
+
+\end{document}
