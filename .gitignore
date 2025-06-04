@@ -8,8 +8,8 @@ dist/dist
 .idea/
 bkup/
 */file_analysis.txt
-*.png
-*.jpg
+# *.png
+# *.jpg
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
