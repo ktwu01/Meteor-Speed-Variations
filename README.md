@@ -1,6 +1,14 @@
 # Meteor-Speed-Variations-analysis
 Code and data for Wu JGR 2024: Diurnal and Seasonal Variations of Meteor Speed and Arrival Angle Observed by Mengcheng Meteor Radar.
 
+<!--- For KW only: ref to related repos:
+https://github.com/ktwu01?tab=repositories&q=&type=&language=matlab&sort=
+https://github.com/ktwu01/ktwu01/tree/main/matlab
+https://github.com/ktwu01/Meteor-Speed-Variations-manuscript
+https://github.com/ktwu01/Snippet-MATLAB
+https://github.com/ktwu01/Functions
+---> 
+
 ## Citation:
 Wu, K., Yi, W., Xue, X., Reid, I., & Lu, M. (2024). Diurnal and Seasonal Variations of Meteor Speed and Arrival Angle Observed by Mengcheng Meteor Radar. Journal of Geophysical Research: Space Physics, 129, e2024JA032767. https://doi.org/10.1029/2024JA032767
 
