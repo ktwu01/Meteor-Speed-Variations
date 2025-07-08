@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 date-released: 2025-07-09
 message: "If you use this code, please cite it as below."
-title: "txtai: the all-in-one AI framework"
+title: "Code and data for Wu JGR 2024: Diurnal and Seasonal Variations of Meteor Speed and Arrival Angle Observed by Mengcheng Meteor Radar."
 abstract: "Code and data for Wu JGR 2024: Diurnal and Seasonal Variations of Meteor Speed and Arrival Angle Observed by Mengcheng Meteor Radar."
 url: "https://github.com/ktwu01/Meteor-Speed-Variations"
 authors:
